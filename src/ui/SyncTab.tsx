@@ -39,12 +39,26 @@ export const SyncTab = ({ parent, providerSettings }: any) => {
     const designTokensCodeStr = JSON.stringify(designTokensJson, null, 2)
     const restyleThemeObject = buildRestyleThemeObject(designTokensJson)
     const restyleThemeObjectStr = JSON.stringify(restyleThemeObject, null, 2).replaceAll('"', '').trim()
-    const restyleThemeCodeStr = `import tokens from './tokens.json';
-import { createTheme } from '@shopify/restyle';
+    const restyleThemeCodeStr = `import tokens from './tokens.generated.json';
 
-const theme = createTheme(${restyleThemeObjectStr});
+const theme = {${restyleThemeObjectStr}};
 
 export type Theme = typeof theme;
+export type ThemeKey = keyof Theme;
+export type ThemeShadow = {
+  color?: string;
+  offsetX?: number;
+  offsetY?: number;
+  radius?: number;
+};
+export type ThemeTextVariant = {
+  fontFamily?: string;
+  fontWeight?: string;
+  fontSize?: number;
+  lineHeight?: number;
+  letterSpacing?: number;
+};
+
 export default theme;
 `
 
@@ -83,7 +97,7 @@ export default theme;
     const element = document.createElement('a')
     const textFile = new Blob([syntaxHighlightedRestyleThemeCode], { type: 'text/plain' }) //pass data from localStorage API to blob
     element.href = URL.createObjectURL(textFile)
-    element.download = 'theme.ts'
+    element.download = 'theme.generated.ts'
     document.body.appendChild(element)
     element.click()
   }
@@ -151,7 +165,7 @@ export default theme;
   return (
     <div style={{ display: 'flex', flexDirection: 'column', margin: '20px' }}>
       <div className={styles.container}>
-        <p style={{ alignSelf: 'center', fontWeight: 'bold', textAlign: 'center' }}>Design Tokens (Generated JSON)</p>
+        <p style={{ alignSelf: 'center', fontWeight: 'bold', textAlign: 'center' }}>Design Tokens (Generated JSON file)</p>
         {_.isEmpty(designTokensGroups) ? (
           <div style={{ margin: '20px 0px' }}>
             <p className={styles.generatedCode}>// No Design Tokens Groups</p>
@@ -177,10 +191,10 @@ export default theme;
         )}
       </div>
       <div className={styles.container} style={{ margin: '20px 0px' }}>
-        <p style={{ alignSelf: 'center', fontWeight: 'bold', textAlign: 'center' }}>Restyle Theme (Generated JS)</p>
+        <p style={{ alignSelf: 'center', fontWeight: 'bold', textAlign: 'center' }}>Theme (Generated Typescript file)</p>
         {_.isEmpty(syntaxHighlightedRestyleThemeCode) ? (
           <div style={{ margin: '20px 0px' }}>
-            <p className={styles.generatedCode}>// No Restyle Theme Code</p>
+            <p className={styles.generatedCode}>// No Theme Code</p>
           </div>
         ) : (
           <div style={{ margin: '20px 0px' }}>
